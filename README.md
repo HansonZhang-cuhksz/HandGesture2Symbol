@@ -43,7 +43,3 @@ The primary challenge is to accurately detect hand gestures in real-time, transl
 - **Data Variability**: Augment dataset with synthetic hand poses and varying backgrounds.  
 - **Model Accuracy**: Experiment with multiple architectures (e.g., Random Forest vs. CNN) and hyperparameter tuning.  
 - **Real-Time Performance**: Optimize OpenPose parameters and use lightweight models.  
-
---- 
-
-This proposal aligns with the course’s emphasis on innovative AI applications and provides a clear roadmap for implementation.
