@@ -19,7 +19,7 @@ The primary challenge is to accurately detect hand gestures in real-time, transl
 ## **c. Work Distribution**  
 - **Student A**: Deploy OpenPose library for real-time hand joint detection and coordinate extraction.  
 - **Student B**: Collect and preprocess a dataset of labeled hand gesture images/videos (500+ samples per symbol).  
-- **Student C**: Design and train a classification model (e.g., SVM, CNN) using the joint position data.  
+- **邵辰航**: Design and train a classification model (e.g., SVM, CNN) using the joint position data.  
 - **Student D**: Develop a Windows-compatible keyboard simulator that maps model predictions to keystrokes.  
 
 ---
