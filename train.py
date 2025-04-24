@@ -8,12 +8,14 @@ from sklearn.metrics import classification_report
 import matplotlib.pyplot as plt
 from model import ClassificationModel
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 def get_keypoints(pth):
     with open(pth, 'r') as f:
         out = []
         f.readline()    # skip first line
         for line in f:
-            out.append([float(num) for num in line.split()])
+            out.append([float(num) for num in line.split()][:-1])
         return out
 
 # 定义自定义数据集类
@@ -27,9 +29,17 @@ class VectorDataset(Dataset):
     
     def __getitem__(self, idx):
         return self.features[idx], self.labels[idx]
+    
+    def to(self, device):
+        self.features = self.features.to(device)
+        self.labels = self.labels.to(device)
 
 # 训练函数
 def train_model(model, train_loader, val_loader, criterion, optimizer, num_epochs=50):
+    model.to(device)
+    train_loader.dataset.to(device)
+    val_loader.dataset.to(device)
+
     train_losses = []
     val_losses = []
     val_accuracies = []
@@ -74,7 +84,9 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, num_epoch
 
         if val_accuracy > best_val_accuracy:
             best_val_accuracy = val_accuracy
-            torch.save(model.state_dict(), 'classification_model.pth')
+            torch.save(model.state_dict(), 'classification_model2.pth')
+            # if best_val_accuracy > 0.8:
+            #     break
         
         val_losses.append(val_loss)
         val_accuracies.append(val_accuracy)
@@ -100,13 +112,14 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, num_epoch
     
     plt.show()
     
-    return model
+    return model.to('cpu')
 
 def load_data():
     X = []
     y = []
     import os
-    for i in list(range(12)) + ['none']:
+    # for i in list(range(12)) + ['none']:
+    for i in list(range(12)):
         files = os.listdir(os.path.join('dataset', str(i)))
         for file in files:
             keypoints = get_keypoints(os.path.join('dataset', str(i), file))
@@ -137,7 +150,7 @@ if __name__ == '__main__':
     
     batch_size = 64
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
     
     # 2. 初始化模型
     model = ClassificationModel()
@@ -147,7 +160,7 @@ if __name__ == '__main__':
     optimizer = optim.Adam(model.parameters(), lr=0.001)
     
     # 4. 训练模型
-    trained_model = train_model(model, train_loader, val_loader, criterion, optimizer, num_epochs=10000)
+    trained_model = train_model(model, train_loader, val_loader, criterion, optimizer, num_epochs=2000)
     
     # 5. 评估模型
     trained_model.eval()
@@ -156,13 +169,15 @@ if __name__ == '__main__':
     
     with torch.no_grad():
         for inputs, labels in val_loader:
+            inputs, labels = inputs.to('cpu'), labels.to('cpu')
             outputs = trained_model(inputs)
             _, preds = torch.max(outputs, 1)
             all_preds.extend(preds.cpu().numpy())
             all_labels.extend(labels.cpu().numpy())
     
     # 打印分类报告
-    class_names = [str(i) for i in range(12)] + ['not_classified']
+    # class_names = [str(i) for i in range(12)] + ['not_classified']
+    class_names = [str(i) for i in range(12)]
     print(classification_report(all_labels, all_preds, target_names=class_names))
     
     # # 6. 保存模型

@@ -4,7 +4,7 @@ import numpy as np
 
 # 初始化模型并加载权重
 model = ClassificationModel()
-model.load_state_dict(torch.load('classification_model.pth', map_location=torch.device('cpu')))
+model.load_state_dict(torch.load('classification_model2.pth', map_location=torch.device('cpu')))
 model.eval()
 
 def get_keypoints(pth):
@@ -12,11 +12,11 @@ def get_keypoints(pth):
         out = []
         f.readline()    # skip first line
         for line in f:
-            out.append([float(num) for num in line.split()])
+            out.append([float(num) for num in line.split()][:-1])
         return out
 
 def predict(input_data):
-    assert input_data.shape == (21, 3)
+    assert input_data.shape == (21, 2)
     outputs = model(torch.from_numpy(input_data).unsqueeze(0))
     probabilities = torch.softmax(outputs, dim=1).squeeze().detach().numpy()
     predicted_class = int(torch.argmax(outputs, dim=1).item())
