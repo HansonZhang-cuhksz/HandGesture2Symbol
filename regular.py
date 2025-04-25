@@ -19,17 +19,23 @@ def predict(input_data):
     thumb = input_data[4][:-1]
     trust = []
     
-    for group in GROUPS:
-        first_point = input_data[group[0]][:-1]
-        second_point = input_data[group[1]][:-1]
-        thumb_to_first = np.linalg.norm(thumb - first_point)
-        thumb_to_second = np.linalg.norm(thumb - second_point)
-        first_to_second = np.linalg.norm(first_point - second_point)
-        dist = thumb_to_first + thumb_to_second
-        if first_to_second == 0:
-            trust.append(np.inf)
-        else:
-            trust.append(dist / first_to_second)
+    #for group in GROUPS:
+    #    first_point = input_data[group[0]][:-1]
+    #    second_point = input_data[group[1]][:-1]
+    #    thumb_to_first = np.linalg.norm(thumb - first_point)
+    #    thumb_to_second = np.linalg.norm(thumb - second_point)
+    #    first_to_second = np.linalg.norm(first_point - second_point)
+    #    dist = thumb_to_first + thumb_to_second
+    #    if first_to_second == 0:
+    #        trust.append(np.inf)
+    #    else:
+    #        trust.append(dist / first_to_second)
+    # min_index = np.argmin(trust)
+    # return min_index
+
+    for point in range(5, 21):
+        trust.append(np.linalg.norm(thumb - point))
+
     min_index = np.argmin(trust)
     return min_index
     
